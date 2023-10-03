@@ -4,8 +4,8 @@ import os
 import subprocess
 from sqlalchemy import text, create_engine, select
 from sqlalchemy.orm import sessionmaker
-from models import Base, User
-
+# from models import Base, User
+from models import mapper_registry, User
 
 def wait_for_logs(command, message):
     try:
@@ -37,7 +37,8 @@ def engine(db_service):
     engine = create_engine(
         f"postgresql+psycopg2://postgres:postgres123@{db_service}/postgres"
     )
-    Base.metadata.create_all(engine)
+    # Base.metadata.create_all(engine)
+    mapper_registry.metadata.create_all(engine)
     yield engine
 
 
@@ -87,6 +88,7 @@ def test_add_user(session, users):
         session.add(krabs)
         session.commit()
         result = session.query(User).all()
+        print(result)
         for user in result:
             print(user.name)
         print(result)
