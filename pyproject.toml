@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "integration-testing-with-docker"
+version = "0.1.0"
+description = ""
+authors = ["Jonathan Howarth <jonathan.michael.howarth@gmail.com>"]
+readme = "README.md"
+packages = [{include = "integration_testing_with_docker"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+SQLAlchemy = "^2.0.21"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "pytest-docker"
+pytest-docker = "^2.0.1"
+psycopg2 = "^2.9.9"
+black = "^23.9.1"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: integration tests",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
