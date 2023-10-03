@@ -15,6 +15,7 @@ pytest = "^7.4.2"
 pytest-docker = "^2.0.1"
 psycopg2 = "^2.9.9"
 black = "^23.9.1"
+pylint = "^3.0.1"
 
 [tool.pytest.ini_options]
 markers = [
