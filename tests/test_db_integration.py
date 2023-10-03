@@ -4,8 +4,10 @@ import os
 import subprocess
 from sqlalchemy import text, create_engine, select
 from sqlalchemy.orm import sessionmaker
+
 # from models import Base, User
 from models import mapper_registry, User
+
 
 def wait_for_logs(command, message):
     try:
