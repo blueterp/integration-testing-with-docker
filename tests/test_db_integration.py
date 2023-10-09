@@ -47,8 +47,8 @@ def engine(db_service):
 @pytest.fixture(scope="function")
 def users():
     yield [
-        User(name="squidward", fullname="Squidward Tentacles"),
-        User(name="ehkrabs", fullname="Eugene H. Krabs"),
+        User(email="squidward@gmail.com", fullname="Squidward Tentacles"),
+        User(email="ehkrabs@gmail.com", fullname="Eugene H. Krabs"),
     ]
 
 
@@ -73,37 +73,26 @@ def test_db_initialization(session):
 
 
 @pytest.mark.integration
-def test_simple_connection(session):
-    with session:
-        result = session.execute(text("select 'hello world'"))
-        assert result.all() == [("hello world",)]
-
-
-@pytest.mark.integration
 def test_add_user(session, users):
     squidward, krabs = [
-        User(name="squidward2", fullname="Squidward2 Tentacles"),
-        User(name="ehkrabs2", fullname="Eugene2 H. Krabs"),
+        User(email="squidward2@gmail.com", fullname="Squidward2 Tentacles"),
+        User(email="ehkrabs2@gmail.com", fullname="Eugene2 H. Krabs"),
     ]
     with session:
         session.add(squidward)
         session.add(krabs)
         session.commit()
         result = session.query(User).all()
-        print(result)
-        for user in result:
-            print(user.name)
-        print(result)
         assert len(result) == 4
 
 
 @pytest.mark.integration
 def test_dont_commit_add_user(session):
-    harry = User(name="harry", fullname="Harry Potter")
+    harry = User(email="harry@gmail.com", fullname="Harry Potter")
     with session:
         session.add(harry)
         session.rollback()
-        result = session.execute(select(User).where(User.name == "harry"))
+        result = session.execute(select(User).where(User.email == "harry@gmail.com"))
 
         assert not result.scalars().all()
 
