@@ -7,7 +7,7 @@ from use_cases import create_user, get_user
 def repo():
     return InMemoryRepo()
 
-@pyest.fixture
+@pytest.fixture
 def user():
     return User("blueterp@gmail.com", "Jonathan Howarth")
 

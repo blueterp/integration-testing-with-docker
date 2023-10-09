@@ -1,7 +1,7 @@
 from repo_interface import Repo
 from user import User
 
-def create_user(user, repo:Repo):
+def create_user(user:User, repo:Repo):
     user_info = user.as_dict()
     repo.create_user(user_info)
 

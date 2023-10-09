@@ -2,9 +2,8 @@ from repo_interface import Repo
 
 class InMemoryRepo(Repo):
     def __init__(self, data=None):
-        if not data:
-            self.data = dict()
-        self.data = data
+            self.data = dict() if data is None else data
+
 
     def create_user(self, user_info):
         self.data[user_info["email"]] = user_info
