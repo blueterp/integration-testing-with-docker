@@ -11,7 +11,7 @@ user_table = Table(
     "user",
     mapper_registry.metadata,
     Column("id", Integer, primary_key=True),
-    Column("email", String(50)),
+    Column("email", String(50), unique=True),
     Column("fullname", String(50)),
 )
 
