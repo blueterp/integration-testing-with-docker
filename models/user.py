@@ -11,4 +11,5 @@ class User:
     id: int = None
 
     def as_dict(self):
+        """Converts Domain model to dictionary"""
         return asdict(self)
