@@ -1,10 +1,14 @@
-from repository.repo_interface import Repo
-from repository.models import User
+"""ORM repo using SQLAlchemy that conforms to Repo interface use in Respository Pattern."""
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+from repository.repo_interface import Repo
+from repository.models import User
+
 
 class ORMRepo(Repo):
+    """ORM Repository that uses SQLAlchemy"""
+
     def __init__(self, engine):
         self.engine = engine
 
