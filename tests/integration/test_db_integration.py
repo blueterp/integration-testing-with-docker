@@ -11,12 +11,10 @@ from repository.models import mapper_registry
 from repository.orm_repo import ORMRepo, User as DBUser
 
 
-
 def wait_for_logs(command, message):
     """Helper function to determine when containerized database is available"""
     logs = subprocess.run(command.split(" "), cwd=os.getcwd(), capture_output=True)
     return message in logs.stdout.decode("utf-8")
-
 
 
 @pytest.fixture(scope="session", name="db_service")
