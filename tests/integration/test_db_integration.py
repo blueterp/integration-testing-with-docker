@@ -1,25 +1,26 @@
-import pytest
+"""Integration tests that use use cases and repo pattern with actual database"""
 from time import sleep
 import os
 import subprocess
-from sqlalchemy import create_engine, select
+import pytest
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from repository.orm_repo import ORMRepo, User as DBUser
 from use_cases.use_cases import create_user, get_user
 from models.user import User
 from repository.models import mapper_registry
+from repository.orm_repo import ORMRepo, User as DBUser
+
 
 
 def wait_for_logs(command, message):
-    try:
-        logs = subprocess.run(command.split(" "), cwd=os.getcwd(), capture_output=True)
-        return message in logs.stdout.decode("utf-8")
-    except Exception as e:
-        return False
+    """Helper function to determine when containerized database is available"""
+    logs = subprocess.run(command.split(" "), cwd=os.getcwd(), capture_output=True)
+    return message in logs.stdout.decode("utf-8")
 
 
-@pytest.fixture(scope="session")
-def db_service(docker_services, docker_ip):
+
+@pytest.fixture(scope="session", name="db_service")
+def fixture_db_service(docker_services, docker_ip):
     """Ensure that database service is up and responsive."""
     port = docker_services.port_for("postgres_db", 5432)
     host = docker_ip
@@ -35,8 +36,9 @@ def db_service(docker_services, docker_ip):
     return f"{host}:{port}"
 
 
-@pytest.fixture(scope="session")
-def engine(db_service):
+@pytest.fixture(scope="session", name="engine")
+def fixture_engine(db_service):
+    """engine for connecting to SQLAlchemy ORM"""
     engine = create_engine(
         f"postgresql+psycopg2://postgres:postgres123@{db_service}/postgres"
     )
@@ -44,18 +46,20 @@ def engine(db_service):
     yield engine
 
 
-@pytest.fixture(scope="function")
-def users():
+@pytest.fixture(scope="function", name="users")
+def fixture_users():
+    """Resuable user info for tests"""
     yield [
         DBUser(email="squidward@gmail.com", fullname="Squidward Tentacles"),
         DBUser(email="ehkrabs@gmail.com", fullname="Eugene H. Krabs"),
     ]
 
 
-@pytest.fixture(scope="function")
-def session(engine, users):
-    DBsession = sessionmaker(engine)
-    session = DBsession()
+@pytest.fixture(scope="function", name="session")
+def fixture_session(engine, users):
+    """Setup and teardown of data in database"""
+    Session = sessionmaker(engine)
+    session = Session()
     with session:
         session.bulk_save_objects(users)
         session.commit()
@@ -65,13 +69,15 @@ def session(engine, users):
         session.commit()
 
 
-@pytest.fixture(scope="session")
-def repo(engine):
+@pytest.fixture(scope="session", name="repo")
+def fixture_repo(engine):
+    """Return ORM based repo in compliance with repository pattern"""
     return ORMRepo(engine)
 
 
 @pytest.mark.integration
 def test_add_user(session, repo):
+    """Test adding two more users to database using use case results in all users persisted"""
     squidward, krabs = [
         {"email": "squidward2@gmail.com", "fullname": "Squidward2 Tentacles"},
         {"email": "ehkrabs2@gmail.com", "fullname": "Eugene2 H. Krabs"},
@@ -85,6 +91,7 @@ def test_add_user(session, repo):
 
 @pytest.mark.integration
 def test_get_user(repo, session):
+    """Test use case for retreving a user by email"""
     harry = DBUser(email="harry@gmail.com", fullname="Harry Potter")
     with session:
         session.add(harry)
